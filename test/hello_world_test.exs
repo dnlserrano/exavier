@@ -1,7 +1,9 @@
 defmodule HelloWorldTest do
+  use ExUnit.Case, async: true
+
   @subject HelloWorld
 
   test "when 0" do
-    @subject.zero?(0) == true
+    assert @subject.zero?(0) == true
   end
 end

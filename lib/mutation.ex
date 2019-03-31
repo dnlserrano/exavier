@@ -1,6 +1,10 @@
 defmodule Exavier.Mutation do
-  def mutate({:<=, meta, args} = fdef) do
+  def mutate({:<=, meta, args}) do
     {:==, meta, mutate_ast(args)}
+  end
+
+  def mutate({:==, meta, args}) do
+    {:>=, meta, mutate_ast(args)}
   end
 
   defp mutate_ast(args) when is_list(args) do
