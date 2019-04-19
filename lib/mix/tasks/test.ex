@@ -1,12 +1,6 @@
 defmodule Mix.Tasks.Exavier.Test do
   use Mix.Task
 
-  alias Mix.Compilers.Test, as: CT
-  alias Mix.Tasks.Test.Cover
-
-  @test_dir ["test"]
-  @cover [output: "cover", tool: Cover]
-
   @shortdoc "Runs mutation testing"
   def run(_args) do
     unless System.get_env("MIX_ENV") || Mix.env() == :test do
@@ -31,27 +25,13 @@ defmodule Mix.Tasks.Exavier.Test do
 
     ExUnit.configure(config)
 
-    cover =
-      Mix.Project.config()
-      |> Mix.Project.compile_path()
-      |> @cover[:tool].start(@cover)
-
     require_test_helper()
 
-    test_files = Mix.Utils.extract_files(@test_dir, "*_test.exs")
+    mutation = Exavier.redefine("lib/hello_world.ex")
+    require IEx; IEx.pry
 
-    case CT.require_and_run(test_files, @test_dir, []) do
-      {:ok, %{failures: failures}} ->
-        cover && cover.()
-
-        cond do
-          failures > 0 ->
-            System.at_exit(fn _ -> exit({:shutdown, 1}) end)
-
-          true ->
-            :ok
-        end
-    end
+    Code.require_file("test/hello_world_test.exs")
+    Code.require_file("test/exavier_test.exs")
   end
 
   defp require_test_helper do
