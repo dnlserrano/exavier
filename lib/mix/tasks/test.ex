@@ -27,11 +27,13 @@ defmodule Mix.Tasks.Exavier.Test do
 
     require_test_helper()
 
-    mutation = Exavier.redefine("lib/hello_world.ex")
-    require IEx; IEx.pry
+    {:ok, server} = Exavier.Server.start_link(self())
 
-    Code.require_file("test/hello_world_test.exs")
-    Code.require_file("test/exavier_test.exs")
+    GenServer.cast(server, :xmen)
+
+    receive do
+      {:end, state} -> Exavier.Formatter.output(state)
+    end
   end
 
   defp require_test_helper do
