@@ -21,25 +21,19 @@ defmodule Exavier.Server do
   def handle_cast(:xmen, state) do
     server = self()
 
+    files = files()
+
     files
     |> Enum.each(fn {file, test_file} ->
       Task.start(fn ->
         # mutate and test
-        mutation = Exavier.redefine(file)
+        _ = Exavier.redefine(file)
         Code.require_file(test_file)
 
-        # collect test stats
-        stats = ExUnit.RunnerStats.stats(self())
-        IO.inspect(stats, label: "stats for #{inspect(files)}")
-        GenServer.cast(server, {:update, files, stats})
+        GenServer.stop(server, :normal)
       end)
     end)
 
-    {:noreply, state}
-  end
-
-  def handle_cast({:update, files, stats}, state) do
-    state = %State{stats: state.stats ++ [{files, stats}]}
     {:noreply, state}
   end
 
