@@ -1,21 +1,17 @@
 # Exavier
 
-**TODO: Add description**
+![](logo.png)
+
+A mutation testing library in Elixir. Inspired by [`pitest`](https://github.com/hcoles/pitest) (http://pitest.org) and [`mutant`](https://github.com/mbj/mutant).
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `exavier` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `exavier` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:exavier, "~> 0.1.0"}
+    {:exavier, "~> 0.0.1"}
   ]
 end
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/exavier](https://hexdocs.pm/exavier).
-
