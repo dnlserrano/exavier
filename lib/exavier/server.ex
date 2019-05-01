@@ -21,21 +21,21 @@ defmodule Exavier.Server do
   def handle_cast(:xmen, state) do
     server = self()
 
-    mutation_1 = [original: :>=, mutation: :==]
-    mutation_2 = [original: :>=, mutation: :<=]
-
     files()
     |> Enum.each(fn {file, test_file} ->
       Task.start(fn ->
-        # operators = Exavier.AST.find_operators(file)
+        quoted = Exavier.AST.file_to_quoted(file)
+        to_mutate = Exavier.AST.mutation_operators(quoted)
 
-        Exavier.redefine(file)
-        Code.require_file(test_file)
-
-        required_test_file(test_file)
-
-        Exavier.redefine(file)
-        Code.require_file(test_file)
+        to_mutate
+        |> Enum.each(fn {operator, _meta} ->
+          Exavier.Mutators.mutators_for(operator)
+          |> Enum.each(fn mutator ->
+            Exavier.redefine(quoted, mutator)
+            Code.require_file(test_file)
+            required_test_file(test_file)
+          end)
+        end)
 
         GenServer.stop(server, :normal)
       end)
