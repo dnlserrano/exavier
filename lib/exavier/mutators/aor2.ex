@@ -1,16 +1,10 @@
 defmodule Exavier.Mutators.AOR2 do
-  @addition :+
-  @subtraction :-
-  @multiplication :*
-  @division :/
-  @remainder :rem
-
   @mutations %{
-    @addition => @multiplication,
-    @subtraction => @multiplication,
-    @multiplication => @remainder,
-    @division => @remainder,
-    @remainder => @division
+    :+ => :*,
+    :- => :*,
+    :* => :rem,
+    :/ => :rem,
+    :rem => :/
   }
 
   def operators, do: Map.keys(@mutations)

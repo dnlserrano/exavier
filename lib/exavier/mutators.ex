@@ -2,7 +2,8 @@ defmodule Exavier.Mutators do
   @mutators [
     __MODULE__.AOR1,
     __MODULE__.AOR2,
-    __MODULE__.ROR1
+    __MODULE__.ROR1,
+    __MODULE__.ROR4,
   ]
 
   def operators do
@@ -13,5 +14,5 @@ defmodule Exavier.Mutators do
     |> Enum.uniq()
   end
 
-  def mutators_for(_operator), do: @mutators
+  def mutators, do: @mutators
 end
