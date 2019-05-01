@@ -21,13 +21,20 @@ defmodule Exavier.Server do
   def handle_cast(:xmen, state) do
     server = self()
 
-    files = files()
+    mutation_1 = [original: :>=, mutation: :==]
+    mutation_2 = [original: :>=, mutation: :<=]
 
-    files
+    files()
     |> Enum.each(fn {file, test_file} ->
       Task.start(fn ->
-        # mutate and test
-        _ = Exavier.redefine(file)
+        # operators = Exavier.AST.find_operators(file)
+
+        Exavier.redefine(file)
+        Code.require_file(test_file)
+
+        required_test_file(test_file)
+
+        Exavier.redefine(file)
         Code.require_file(test_file)
 
         GenServer.stop(server, :normal)
@@ -35,6 +42,16 @@ defmodule Exavier.Server do
     end)
 
     {:noreply, state}
+  end
+
+  def required_test_file(test_file) do
+    test_file =
+      Code.required_files()
+      |> Enum.find(fn required_file ->
+        String.contains?(required_file, test_file)
+      end)
+
+    Code.unrequire_files([test_file])
   end
 
   def test_files, do: Path.wildcard("test/**/*_test.exs")
