@@ -1,8 +1,13 @@
 defmodule Exavier.AST do
   def file_to_quoted(file) do
-    file
-    |> File.read!()
-    |> Code.string_to_quoted!()
+    quoted =
+      file
+      |> File.read!()
+      |> Code.string_to_quoted!()
+
+    {:defmodule, _mod_meta, [{:__aliases__, _alias_meta, [module_name]}, do_block]} = quoted
+
+    {:"Elixir.#{module_name}", quoted}
   end
 
   def mutation_operators({:defmodule, _mod_meta, [{:__aliases__, _alias_meta, [_module_name]}, do_block]}) do

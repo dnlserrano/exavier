@@ -24,17 +24,14 @@ defmodule Exavier.Server do
     files()
     |> Enum.each(fn {file, test_file} ->
       Task.start(fn ->
-        quoted = Exavier.AST.file_to_quoted(file)
-        to_mutate = Exavier.AST.mutation_operators(quoted)
+        {module_name, quoted} = Exavier.AST.file_to_quoted(file)
+        lines_to_mutate = Exavier.Cover.lines_to_mutate(module_name, test_file)
 
-        to_mutate
-        |> Enum.each(fn {operator, _meta} ->
-          Exavier.Mutators.mutators_for(operator)
-          |> Enum.each(fn mutator ->
-            Exavier.redefine(quoted, mutator)
-            Code.require_file(test_file)
-            required_test_file(test_file)
-          end)
+        Exavier.Mutators.mutators()
+        |> Enum.each(fn mutator ->
+          Exavier.redefine(quoted, mutator)
+          Code.require_file(test_file)
+          unrequire_test_file(test_file)
         end)
 
         GenServer.stop(server, :normal)
@@ -44,7 +41,7 @@ defmodule Exavier.Server do
     {:noreply, state}
   end
 
-  def required_test_file(test_file) do
+  defp unrequire_test_file(test_file) do
     test_file =
       Code.required_files()
       |> Enum.find(fn required_file ->

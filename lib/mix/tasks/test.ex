@@ -26,9 +26,9 @@ defmodule Mix.Tasks.Exavier.Test do
     ExUnit.configure(config)
 
     require_test_helper()
+    Code.compiler_options(ignore_module_conflict: true)
 
     {:ok, server} = Exavier.Server.start_link(self())
-
     GenServer.cast(server, :xmen)
 
     receive do
