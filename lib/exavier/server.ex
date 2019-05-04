@@ -29,9 +29,15 @@ defmodule Exavier.Server do
 
         Exavier.Mutators.mutators()
         |> Enum.each(fn mutator ->
-          Exavier.redefine(quoted, mutator)
-          Code.require_file(test_file)
-          unrequire_test_file(test_file)
+          case Exavier.redefine(quoted, mutator, lines_to_mutate) do
+            {:mutated, _original, _mutated} ->
+              Code.require_file(test_file)
+              Exavier.unrequire_test_file(test_file)
+              ExUnit.Server.modules_loaded()
+              ExUnit.run()
+
+            _ -> :noop
+          end
         end)
 
         GenServer.stop(server, :normal)
@@ -39,16 +45,6 @@ defmodule Exavier.Server do
     end)
 
     {:noreply, state}
-  end
-
-  defp unrequire_test_file(test_file) do
-    test_file =
-      Code.required_files()
-      |> Enum.find(fn required_file ->
-        String.contains?(required_file, test_file)
-      end)
-
-    Code.unrequire_files([test_file])
   end
 
   def test_files, do: Path.wildcard("test/**/*_test.exs")

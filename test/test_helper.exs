@@ -1,1 +1,1 @@
-ExUnit.start()
+ExUnit.start(autorun: false)

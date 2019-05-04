@@ -18,13 +18,17 @@ defmodule Mix.Tasks.Exavier.Test do
       {:error, {:already_loaded, :ex_unit}} -> :ok
     end
 
-    config = Keyword.merge(
-      ExUnit.configuration(),
-      Application.get_all_env(:ex_unit)
-    )
+    config = ExUnit.configuration()
+    formatters =
+      config[:formatters] ++ [Exavier.Formatter]
+      |> Enum.uniq()
+
+    config =
+      config
+      |> Keyword.merge(Application.get_all_env(:ex_unit))
+      |> Keyword.merge(formatters: formatters)
 
     ExUnit.configure(config)
-
     require_test_helper()
     Code.compiler_options(ignore_module_conflict: true)
 
@@ -32,7 +36,7 @@ defmodule Mix.Tasks.Exavier.Test do
     GenServer.cast(server, :xmen)
 
     receive do
-      {:end, state} -> Exavier.Formatter.output(state)
+      {:end, _state} -> IO.puts("C'est fini.")
     end
   end
 
