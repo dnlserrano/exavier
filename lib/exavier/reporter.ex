@@ -12,12 +12,13 @@ defmodule Exavier.Reporter do
 
   @impl GenServer
   def handle_cast({:test_finished, %ExUnit.Test{state: nil}}, state) do
-    IO.puts("Mutant survived")
+    failure(".") |> IO.write()
     state = %{state | passed: state.passed + 1}
     {:noreply, state}
   end
 
   def handle_cast({:test_finished, %ExUnit.Test{state: {:failed, _failed}}}, state) do
+    success(".") |> IO.write()
     state = %{state | failed: state.failed + 1}
     {:noreply, state}
   end
@@ -28,19 +29,30 @@ defmodule Exavier.Reporter do
     percentage =
       (state.failed * 1.0 / total) * 100
       |> Float.round(2)
-      |> Float.to_string
 
+    message =
+      "#{total} tests, #{state.failed} failed (mutants killed), #{state.passed} passed (mutants survived)\
+    \n#{percentage}% mutation coverage"
 
-    case state.passed > 0 do
-      true -> IO.puts("Exavier reports: \"Some mutants have survived\"")
-      _ -> IO.puts("Exavier reports: \"All mutants have been killed\"")
-    end
+    message =
+      cond do
+        percentage > 75 -> success(message)
+        percentage > 70 -> warning(message)
+        true -> failure(message)
+      end
 
-    IO.puts("Total test runs: #{total}")
-    IO.puts("Tests failed (mutants killed): #{state.failed}")
-    IO.puts("Tests passed (mutants survived): #{state.passed}")
-    IO.puts("Mutation coverage: #{percentage}%")
+    IO.puts("\n#{message}")
 
     {:reply, :ok, state}
   end
+
+  defp colorize(escape, string) do
+    [escape, string, :reset]
+    |> IO.ANSI.format_fragment(true)
+    |> IO.iodata_to_binary()
+  end
+
+  defp success(msg), do: colorize(:green, msg)
+  defp warning(msg), do: colorize(:yellow, msg)
+  defp failure(msg), do: colorize(:red, msg)
 end
