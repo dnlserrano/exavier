@@ -1,7 +1,7 @@
 defmodule Exavier.Server do
-  alias Exavier.State
-
   use GenServer
+
+  defstruct runner_pid: nil
 
   @test_file_regexp ~r/^test(.*)_test.exs/
   @source_file_replacement "lib\\1.ex"
@@ -9,12 +9,12 @@ defmodule Exavier.Server do
   def start_link(runner_pid) do
     GenServer.start_link(
       __MODULE__,
-      %State{runner_pid: runner_pid},
+      %__MODULE__{runner_pid: runner_pid},
       name: __MODULE__
     )
   end
 
-  def init(%State{} = state) do
+  def init(state) do
     {:ok, state}
   end
 
@@ -24,7 +24,7 @@ defmodule Exavier.Server do
     files()
     |> Enum.each(fn {file, test_file} ->
       Task.start(fn ->
-        {module_name, quoted} = Exavier.AST.file_to_quoted(file)
+        {module_name, quoted} = Exavier.file_to_quoted(file)
         lines_to_mutate = Exavier.Cover.lines_to_mutate(module_name, test_file)
 
         Exavier.Mutators.mutators()

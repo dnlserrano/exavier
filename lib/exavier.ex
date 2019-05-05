@@ -3,6 +3,17 @@ defmodule Exavier do
   Documentation for Exavier.
   """
 
+  def file_to_quoted(file) do
+    quoted =
+      file
+      |> File.read!()
+      |> Code.string_to_quoted!()
+
+    {:defmodule, _mod_meta, [{:__aliases__, _alias_meta, [module_name]}, _do_block]} = quoted
+
+    {:"Elixir.#{module_name}", quoted}
+  end
+
   def redefine(original, mutator, lines_to_mutate) do
     mutated =
       original
