@@ -5,7 +5,7 @@ defmodule Exavier.Cover do
     :cover.compile_beam(module_name)
 
     Code.require_file(test_file)
-    Exavier.unrequire_test_file(test_file)
+    Exavier.unrequire_file(test_file)
     ExUnit.Server.modules_loaded()
     ExUnit.run()
 

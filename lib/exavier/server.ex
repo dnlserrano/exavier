@@ -32,7 +32,7 @@ defmodule Exavier.Server do
           case Exavier.redefine(quoted, mutator, lines_to_mutate) do
             {:mutated, _original, _mutated} ->
               Code.require_file(test_file)
-              Exavier.unrequire_test_file(test_file)
+              Exavier.unrequire_file(test_file)
               ExUnit.Server.modules_loaded()
               ExUnit.run()
 

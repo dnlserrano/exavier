@@ -31,14 +31,14 @@ defmodule Exavier do
     {result, original, mutated}
   end
 
-  def unrequire_test_file(test_file) do
-    test_file =
+  def unrequire_file(file) do
+    to_unrequire =
       Code.required_files()
       |> Enum.find(fn required_file ->
-        String.contains?(required_file, test_file)
+        String.contains?(required_file, file)
       end)
 
-    Code.unrequire_files([test_file])
+    Code.unrequire_files([to_unrequire])
   end
 
   defp mutate_all({:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, do_block]}, mutator, lines_to_mutate) do
