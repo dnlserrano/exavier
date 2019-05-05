@@ -27,11 +27,12 @@ defmodule Mix.Tasks.Exavier.Test do
     require_test_helper()
     Code.compiler_options(ignore_module_conflict: true)
 
+    {:ok, reporter} = Exavier.Reporter.start_link(name: :exavier_reporter)
     {:ok, server} = Exavier.Server.start_link(self())
     GenServer.cast(server, :xmen)
 
     receive do
-      {:end, _state} -> IO.puts("C'est fini.")
+      {:end, _state} -> GenServer.call(reporter, :report)
     end
   end
 
