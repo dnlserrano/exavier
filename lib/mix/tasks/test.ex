@@ -18,15 +18,10 @@ defmodule Mix.Tasks.Exavier.Test do
       {:error, {:already_loaded, :ex_unit}} -> :ok
     end
 
-    config = ExUnit.configuration()
-    formatters =
-      config[:formatters] ++ [Exavier.Formatter]
-      |> Enum.uniq()
-
     config =
-      config
+      ExUnit.configuration()
       |> Keyword.merge(Application.get_all_env(:ex_unit))
-      |> Keyword.merge(formatters: formatters)
+      |> Keyword.merge(formatters: [Exavier.Formatter], autorun: false)
 
     ExUnit.configure(config)
     require_test_helper()
