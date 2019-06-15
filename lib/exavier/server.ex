@@ -40,6 +40,8 @@ defmodule Exavier.Server do
           end
         end)
 
+        # TODO:
+        # only terminate after all tasks are complete
         GenServer.stop(server, :normal)
       end)
     end)
