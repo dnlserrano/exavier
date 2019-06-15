@@ -1,7 +1,10 @@
 defmodule Exavier.Reporter do
   use GenServer
 
-  defstruct module_states: %{}, failed: 0, passed: 0
+  # mutated_modules :: map
+  # key :: module name :: string
+  # value :: mutation info :: Exavier.Mutation
+  defstruct mutated_modules: %{}, failed: 0, passed: 0
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, %__MODULE__{}, opts)
@@ -17,8 +20,7 @@ defmodule Exavier.Reporter do
       |> current_state(state)
       |> next_state()
 
-    state =
-      %{state | module_states: Map.put(state.module_states, module, next_state)}
+    state = update_mutated_module_state(state, module, next_state)
 
     {:noreply, state}
   end
@@ -92,9 +94,21 @@ defmodule Exavier.Reporter do
   defp warning(msg), do: colorize(:yellow, msg)
   defp failure(msg), do: colorize(:red, msg)
 
-  defp current_state(module, state), do: Map.get(state.module_states, module)
+  defp current_state(module, state) do
+    mutated_module = Map.get(state.mutated_modules, module)
+    mutated_module && mutated_module.state
+  end
 
   defp next_state(nil), do: :cover
   defp next_state(:cover), do: :mutation
   defp next_state(state), do: state
+
+  defp update_mutated_module_state(state, module, module_state) do
+    mutated_module = Map.get(state.mutated_modules, module) || %Exavier.Mutation{}
+
+    mutated_modules =
+      Map.put(state.mutated_modules, module, %{mutated_module | state: module_state})
+
+    %{state | mutated_modules: mutated_modules}
+  end
 end

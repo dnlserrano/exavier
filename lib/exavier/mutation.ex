@@ -1,3 +1,3 @@
 defmodule Exavier.Mutation do
-  defstruct [:original, :mutation]
+  defstruct [:original, :mutation, :state]
 end
