@@ -30,7 +30,8 @@ defmodule Exavier.Server do
         Exavier.Mutators.mutators()
         |> Enum.each(fn mutator ->
           case Exavier.redefine(quoted, mutator, lines_to_mutate) do
-            {:mutated, _original, _mutated} ->
+            {:mutated, original, mutated} ->
+              record_mutation(test_file, lines_to_mutate, original, mutated)
               Code.require_file(test_file)
               Exavier.unrequire_file(test_file)
               ExUnit.Server.modules_loaded()
@@ -64,5 +65,12 @@ defmodule Exavier.Server do
 
   def terminate(:normal, state) do
     send(state.runner_pid, {:end, state})
+  end
+
+  defp record_mutation(test_file, mutated_lines, original, mutated) do
+    module = Exavier.test_file_to_module(test_file)
+
+    Process.whereis(:exavier_reporter)
+    |> GenServer.cast({:mutation, module, mutated_lines, original, mutated})
   end
 end

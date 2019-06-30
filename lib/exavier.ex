@@ -11,7 +11,52 @@ defmodule Exavier do
 
     {:defmodule, _mod_meta, [{:__aliases__, _alias_meta, [module_name]}, _do_block]} = quoted
 
-    {:"Elixir.#{module_name}", quoted}
+    atom_module = string_to_elixir_module(module_name)
+
+    {atom_module, quoted}
+  end
+
+  def test_module_to_module(test_module) do
+    test_module
+    |> to_string()
+    |> String.trim_trailing("Test")
+    |> Macro.camelize()
+    |> string_to_elixir_module()
+  end
+
+  def test_file_to_module(test_file) do
+    test_file
+    |> Path.basename()
+    |> String.trim_trailing("_test.exs")
+    |> String.trim_trailing("_test.ex")
+    |> Macro.camelize()
+    |> string_to_elixir_module()
+  end
+
+  def quoted_to_string([do: {:__block__, [], args}], lines) do
+    quoted_to_string(args, lines)
+  end
+
+  def quoted_to_string([do: do_block], lines) do
+    quoted_to_string(do_block, lines)
+  end
+
+  def quoted_to_string({_op, [line: line], args} = quoted, lines) do
+    case Enum.member?(lines, line) do
+      true -> Macro.to_string(quoted)
+      _ -> quoted_to_string(args, lines)
+    end
+  end
+
+  def quoted_to_string(args, lines) when is_list(args) do
+    args
+    |> Enum.map(& quoted_to_string(&1, lines))
+    |> Enum.reject(& is_nil(&1))
+    |> List.flatten()
+  end
+
+  def quoted_to_string(_anything, _lines) do
+    nil
   end
 
   def redefine(original, mutator, lines_to_mutate) do
@@ -39,6 +84,14 @@ defmodule Exavier do
       end)
 
     Code.unrequire_files([to_unrequire])
+  end
+
+  defp string_to_elixir_module("Elixir." <> _rest = module_name) do
+    String.to_existing_atom(module_name)
+  end
+
+  defp string_to_elixir_module(module_name) do
+    String.to_existing_atom("Elixir.#{module_name}")
   end
 
   defp mutate_all({:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, do_block]}, mutator, lines_to_mutate) do

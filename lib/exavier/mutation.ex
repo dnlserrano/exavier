@@ -1,3 +1,10 @@
 defmodule Exavier.Mutation do
-  defstruct [:original, :mutation, :state]
+  defstruct [
+    status: :not_recording,
+    mutated_lines: [],
+    failed: 0,
+    passed: 0,
+    original: nil,
+    mutation: nil
+  ]
 end

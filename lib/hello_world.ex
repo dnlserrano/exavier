@@ -1,6 +1,4 @@
 defmodule HelloWorld do
-  def zero?(val) do
-    IO.inspect(val == 3)
-    val == 0
-  end
+  def even?(:infinity), do: nil
+  def even?(x), do: rem(x, 2) == 0
 end

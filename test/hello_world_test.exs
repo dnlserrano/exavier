@@ -3,7 +3,11 @@ defmodule HelloWorldTest do
 
   @subject HelloWorld
 
-  test "when 0" do
-    assert @subject.zero?(0) == true
+  test "when 2" do
+    assert @subject.even?(2) == true
+  end
+
+  test "when infinity" do
+    assert @subject.even?(:infinity) == nil
   end
 end

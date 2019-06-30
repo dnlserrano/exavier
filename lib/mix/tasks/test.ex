@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Exavier.Test do
     GenServer.cast(server, :xmen)
 
     receive do
-      {:end, _state} -> GenServer.call(reporter, :report)
+      {:end, _state} -> GenServer.call(reporter, :report, :infinity)
     end
   end
 

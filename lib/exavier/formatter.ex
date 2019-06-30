@@ -7,12 +7,6 @@ defmodule Exavier.Formatter do
   end
 
   @impl GenServer
-  def handle_cast({:test_started, %ExUnit.Test{}} = event, state) do
-    report(event)
-    {:noreply, state}
-  end
-
-  @impl GenServer
   def handle_cast({:test_finished, %ExUnit.Test{state: nil}} = event, state) do
     report(event)
     {:noreply, state}

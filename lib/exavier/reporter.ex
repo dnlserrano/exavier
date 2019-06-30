@@ -2,9 +2,9 @@ defmodule Exavier.Reporter do
   use GenServer
 
   # mutated_modules :: map
-  # key :: module name :: string
-  # value :: mutation info :: Exavier.Mutation
-  defstruct mutated_modules: %{}, failed: 0, passed: 0
+  #   * key :: module name :: string
+  #   * value :: mutation info :: Exavier.Mutation
+  defstruct mutated_modules: %{}
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, %__MODULE__{}, opts)
@@ -14,45 +14,65 @@ defmodule Exavier.Reporter do
   def init(state), do: {:ok, state}
 
   @impl GenServer
-  def handle_cast({:test_started, %ExUnit.Test{module: module}}, state) do
-    next_state =
-      module
-      |> current_state(state)
-      |> next_state()
+  def handle_cast({:mutation, module, mutated_lines, original, mutation}, state) do
+    mutated_module = mutated_module(state, module)
 
-    state = update_mutated_module_state(state, module, next_state)
+    mutated_modules =
+      Map.put(state.mutated_modules, module, %{
+        mutated_module |
+        status: :recording,
+        original: original,
+        mutation: mutation,
+        mutated_lines: mutated_lines
+      })
 
-    {:noreply, state}
+    {:noreply, %{state | mutated_modules: mutated_modules}}
   end
 
   @impl GenServer
-  def handle_cast({:test_finished, %ExUnit.Test{state: nil, module: module}}, state) do
+  def handle_cast({:test_finished, %ExUnit.Test{state: nil, module: test_module}}, state) do
+    module = Exavier.test_module_to_module(test_module)
     state = measure_mutation_survived(module, state)
     {:noreply, state}
   end
 
   @impl GenServer
-  def handle_cast({:test_finished, %ExUnit.Test{state: {:failed, _failed}, module: module}}, state) do
+  def handle_cast({:test_finished, %ExUnit.Test{state: {:failed, _failed}, module: test_module}}, state) do
+    module = Exavier.test_module_to_module(test_module)
     state = measure_mutation_killed(module, state)
     {:noreply, state}
   end
 
   @impl GenServer
   def handle_call(:report, _from, state) do
-    total = state.passed + state.failed
+    failed =
+      state.mutated_modules
+      |> Enum.reduce(0, fn {_, info}, sum -> info.failed + sum end)
+
+    passed =
+      state.mutated_modules
+      |> Enum.reduce(0, fn {_, info}, sum -> info.passed + sum end)
+
+    total = passed + failed
     percentage =
-      (state.failed * 1.0 / total) * 100
+      (failed * 1.0 / total) * 100
       |> Float.round(2)
 
+    IO.puts("\n")
+
+    state.mutated_modules
+    |> Enum.each(fn {module, info} ->
+      if info.passed > 0, do: explain(state, module)
+    end)
+
     message =
-      "#{total} tests, #{state.failed} failed (mutants killed), #{state.passed} passed (mutants survived)\
+      "#{total} tests, #{failed} failed (mutants killed), #{passed} passed (mutants survived)\
     \n#{percentage}% mutation coverage"
 
     message =
       cond do
-        percentage > 75 -> success(message)
-        percentage > 70 -> warning(message)
-        true -> failure(message)
+        percentage > 75 -> green(message)
+        true -> red(message)
       end
 
     IO.puts("\n#{message}")
@@ -67,48 +87,62 @@ defmodule Exavier.Reporter do
   end
 
   defp measure_mutation_killed(module, state) do
-    module_state = current_state(module, state)
-    do_measure_mutation_killed(state, module_state)
+    mutated_module = mutated_module(state, module)
+    do_measure_mutation_killed(module, mutated_module, state)
   end
 
-  defp do_measure_mutation_killed(state, :mutation) do
-    success(".") |> IO.write()
-    %{state | failed: state.failed + 1}
-  end
-
-  defp do_measure_mutation_killed(state, _module_state), do: state
-
-  defp measure_mutation_survived(module, state) do
-    module_state = current_state(module, state)
-    do_measure_mutation_survived(state, module_state)
-  end
-
-  defp do_measure_mutation_survived(state, :mutation) do
-    failure(".") |> IO.write()
-    %{state | passed: state.passed + 1}
-  end
-
-  defp do_measure_mutation_survived(state, _module_state), do: state
-
-  defp success(msg), do: colorize(:green, msg)
-  defp warning(msg), do: colorize(:yellow, msg)
-  defp failure(msg), do: colorize(:red, msg)
-
-  defp current_state(module, state) do
-    mutated_module = Map.get(state.mutated_modules, module)
-    mutated_module && mutated_module.state
-  end
-
-  defp next_state(nil), do: :cover
-  defp next_state(:cover), do: :mutation
-  defp next_state(state), do: state
-
-  defp update_mutated_module_state(state, module, module_state) do
-    mutated_module = Map.get(state.mutated_modules, module) || %Exavier.Mutation{}
-
+  defp do_measure_mutation_killed(module, %{status: :recording} = mutated_module, state) do
+    failed = mutated_module.failed + 1
     mutated_modules =
-      Map.put(state.mutated_modules, module, %{mutated_module | state: module_state})
+      Map.put(state.mutated_modules, module, %{mutated_module | failed: failed})
+
+    green(".") |> IO.write()
 
     %{state | mutated_modules: mutated_modules}
+  end
+
+  defp do_measure_mutation_killed(_, _, state), do: state
+
+  defp measure_mutation_survived(module, state) do
+    mutated_module = mutated_module(state, module)
+    do_measure_mutation_survived(module, mutated_module, state)
+  end
+
+  defp do_measure_mutation_survived(module, %{status: :recording} = mutated_module, state) do
+    passed = mutated_module.passed + 1
+    mutated_modules =
+      Map.put(state.mutated_modules, module, %{mutated_module | passed: passed})
+
+    red(".") |> IO.write()
+
+    %{state | mutated_modules: mutated_modules}
+  end
+
+  defp do_measure_mutation_survived(_, _, state), do: state
+
+  defp explain(state, module) do
+    mutated_module = mutated_module(state, module)
+
+    original =
+      mutated_module.original
+      |> Exavier.quoted_to_string(mutated_module.mutated_lines)
+
+    mutated =
+      mutated_module.mutation
+      |> Exavier.quoted_to_string(mutated_module.mutated_lines)
+
+    Enum.zip(original, mutated)
+    |> Enum.each(fn {o, m} ->
+      IO.write("\n#{red(o)}\n")
+      IO.write("#{green(m)}\n")
+      IO.write("\n")
+    end)
+  end
+
+  defp green(msg), do: colorize(:green, msg)
+  defp red(msg), do: colorize(:red, msg)
+
+  defp mutated_module(state, module) do
+    Map.get(state.mutated_modules, module) || %Exavier.Mutation{}
   end
 end
