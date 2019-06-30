@@ -4,7 +4,7 @@ defmodule Exavier.Reporter do
   # mutated_modules :: map
   #   * key :: module name :: string
   #   * value :: mutation info :: Exavier.Mutation
-  defstruct mutated_modules: %{}
+  defstruct mutated_modules: %{}, all_failures: []
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, %__MODULE__{}, opts)
@@ -30,9 +30,9 @@ defmodule Exavier.Reporter do
   end
 
   @impl GenServer
-  def handle_cast({:test_finished, %ExUnit.Test{state: nil, module: test_module}}, state) do
+  def handle_cast({:test_finished, %ExUnit.Test{state: nil, module: test_module} = test}, state) do
     module = Exavier.test_module_to_module(test_module)
-    state = measure_mutation_survived(module, state)
+    state = measure_mutation_survived(module, test, state)
     {:noreply, state}
   end
 
@@ -60,9 +60,16 @@ defmodule Exavier.Reporter do
 
     IO.puts("\n")
 
-    state.mutated_modules
-    |> Enum.each(fn {module, info} ->
-      if info.passed > 0, do: explain(state, module)
+    state.all_failures
+    |> Enum.with_index()
+    |> Enum.each(fn {{original, mutated, test}, i} ->
+      tags = test.tags
+
+      IO.write("#{i + 1}) #{tags.test} (#{tags.module})\n")
+      IO.write("#{red(original)}\n")
+      IO.write("#{green(mutated)}\n")
+      IO.write("#{tags.file}:#{tags.line}\n")
+      IO.write("\n")
     end)
 
     message =
@@ -103,24 +110,26 @@ defmodule Exavier.Reporter do
 
   defp do_measure_mutation_killed(_, _, state), do: state
 
-  defp measure_mutation_survived(module, state) do
+  defp measure_mutation_survived(module, test, state) do
     mutated_module = mutated_module(state, module)
-    do_measure_mutation_survived(module, mutated_module, state)
+    do_measure_mutation_survived(module, mutated_module, test, state)
   end
 
-  defp do_measure_mutation_survived(module, %{status: :recording} = mutated_module, state) do
+  defp do_measure_mutation_survived(module, %{status: :recording} = mutated_module, test, state) do
     passed = mutated_module.passed + 1
     mutated_modules =
       Map.put(state.mutated_modules, module, %{mutated_module | passed: passed})
 
+    all_failures = state.all_failures ++ [explain(module, test, state)]
+
     red(".") |> IO.write()
 
-    %{state | mutated_modules: mutated_modules}
+    %{state | mutated_modules: mutated_modules, all_failures: all_failures}
   end
 
-  defp do_measure_mutation_survived(_, _, state), do: state
+  defp do_measure_mutation_survived(_, _, _, state), do: state
 
-  defp explain(state, module) do
+  defp explain(module, test, state) do
     mutated_module = mutated_module(state, module)
 
     original =
@@ -131,12 +140,7 @@ defmodule Exavier.Reporter do
       mutated_module.mutation
       |> Exavier.quoted_to_string(mutated_module.mutated_lines)
 
-    Enum.zip(original, mutated)
-    |> Enum.each(fn {o, m} ->
-      IO.write("\n#{red(o)}\n")
-      IO.write("#{green(m)}\n")
-      IO.write("\n")
-    end)
+    {original, mutated, test}
   end
 
   defp green(msg), do: colorize(:green, msg)
