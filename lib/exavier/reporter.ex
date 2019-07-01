@@ -66,10 +66,9 @@ defmodule Exavier.Reporter do
       tags = test.tags
 
       IO.write("#{i + 1}) #{tags.test} (#{tags.module})\n")
-      IO.write("#{red(original)}\n")
-      IO.write("#{green(mutated)}\n")
-      IO.write("#{tags.file}:#{tags.line}\n")
-      IO.write("\n")
+      IO.write("#{original |> diff("  -") |> red()}\n")
+      IO.write("#{mutated |> diff("  +") |> green()}\n")
+      IO.write("#{tags.file}:#{tags.line}\n\n")
     end)
 
     message =
@@ -143,6 +142,7 @@ defmodule Exavier.Reporter do
     {original, mutated, test}
   end
 
+  defp diff(msg, padding_symbols), do: "#{padding_symbols} " <> Regex.replace(~r/\n(.*)/, msg, "\n#{padding_symbols} \\1")
   defp green(msg), do: colorize(:green, msg)
   defp red(msg), do: colorize(:red, msg)
 

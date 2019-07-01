@@ -53,11 +53,10 @@ defmodule Exavier do
     |> Enum.map(& quoted_to_string(&1, lines))
     |> Enum.reject(& is_nil(&1))
     |> List.flatten()
+    |> Enum.at(0)
   end
 
-  def quoted_to_string(_anything, _lines) do
-    nil
-  end
+  def quoted_to_string(_anything, _lines), do: nil
 
   def redefine(original, mutator, lines_to_mutate) do
     mutated =
