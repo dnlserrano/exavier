@@ -53,7 +53,6 @@ defmodule Exavier do
     |> Enum.map(& quoted_to_string(&1, lines))
     |> Enum.reject(& is_nil(&1))
     |> List.flatten()
-    |> Enum.at(0)
   end
 
   def quoted_to_string(_anything, _lines), do: nil

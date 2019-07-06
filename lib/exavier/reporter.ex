@@ -66,8 +66,19 @@ defmodule Exavier.Reporter do
       tags = test.tags
 
       IO.write("#{i + 1}) #{tags.test} (#{tags.module})\n")
-      IO.write("#{original |> diff("  -") |> red()}\n")
-      IO.write("#{mutated |> diff("  +") |> green()}\n")
+
+      original
+      |> Enum.each(fn o ->
+        IO.write("#{o |> diff("  -") |> red()}\n")
+        IO.write("\n")
+      end)
+
+      mutated
+      |> Enum.each(fn m ->
+        IO.write("#{m |> diff("  -") |> green()}\n")
+        IO.write("\n")
+      end)
+
       IO.write("#{tags.file}:#{tags.line}\n\n")
     end)
 
