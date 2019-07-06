@@ -93,40 +93,39 @@ defmodule Exavier do
     String.to_existing_atom("Elixir.#{module_name}")
   end
 
-  defp mutate_all({:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, do_block]}, mutator, lines_to_mutate) do
+  def mutate_all({:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, do_block]}, mutator, lines_to_mutate) do
     mutated_do_block = mutate_all(do_block, mutator, lines_to_mutate)
     {:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, mutated_do_block]}
   end
 
-  defp mutate_all([{construct, construct_body} | rest], mutator, lines_to_mutate) do
+  def mutate_all([{construct, construct_body} | rest], mutator, lines_to_mutate) do
     mutated_construct_body = mutate_all(construct_body, mutator, lines_to_mutate)
     mutated_rest = mutate_all(rest, mutator, lines_to_mutate)
 
     [{construct, mutated_construct_body} | mutated_rest]
   end
 
-  defp mutate_all({operator, meta, args}, mutator, lines_to_mutate) do
+  def mutate_all({operator, meta, args} = ast, mutator, lines_to_mutate) do
     case Enum.member?(lines_to_mutate, meta[:line]) do
       true ->
-        mutated_args = mutate_all(args, mutator, lines_to_mutate)
-        mutated_operator =
-          case apply(mutator, :mutate, [operator]) do
-            nil -> operator
-            mutation -> mutation
-          end
+        case apply(mutator, :mutate, [ast, lines_to_mutate]) do
+          :skip ->
+            {operator, meta, mutate_all(args, mutator, lines_to_mutate)}
 
-          {mutated_operator, meta, mutated_args}
+          mutated_ast ->
+            mutated_ast
+        end
 
       _ -> {operator, meta, mutate_all(args, mutator, lines_to_mutate)}
     end
   end
 
-  defp mutate_all([head | rest], mutator, lines_to_mutate) do
+  def mutate_all([head | rest], mutator, lines_to_mutate) do
     [
       mutate_all(head, mutator, lines_to_mutate) |
       mutate_all(rest, mutator, lines_to_mutate)
     ]
   end
 
-  defp mutate_all(any, _mutator, _lines_to_mutate), do: any
+  def mutate_all(any, _mutator, _lines_to_mutate), do: any
 end
