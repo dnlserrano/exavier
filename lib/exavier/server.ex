@@ -30,14 +30,14 @@ defmodule Exavier.Server do
         Exavier.Mutators.mutators()
         |> Enum.each(fn mutator ->
           case Exavier.redefine(quoted, mutator, lines_to_mutate) do
-            {:mutated, original, mutated} ->
-              record_mutation(test_file, lines_to_mutate, original, mutated)
+            {[], _, _} -> :noop
+
+            {mutated_lines, original, mutated} ->
+              record_mutation(test_file, mutated_lines, original, mutated)
               Code.require_file(test_file)
               Exavier.unrequire_file(test_file)
               ExUnit.Server.modules_loaded()
               ExUnit.run()
-
-            _ -> :noop
           end
         end)
 

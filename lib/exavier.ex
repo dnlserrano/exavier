@@ -58,20 +58,14 @@ defmodule Exavier do
   def quoted_to_string(_anything, _lines), do: nil
 
   def redefine(original, mutator, lines_to_mutate) do
-    mutated =
+    {mutated_lines, mutated} =
       original
-      |> mutate_all(mutator, lines_to_mutate)
+      |> mutate_all(mutator, lines_to_mutate, [])
 
     mutated
     |> Code.compile_quoted()
 
-    result =
-      case original != mutated do
-        true -> :mutated
-        _ -> :original
-      end
-
-    {result, original, mutated}
+    {mutated_lines, original, mutated}
   end
 
   def unrequire_file(file) do
@@ -92,39 +86,66 @@ defmodule Exavier do
     String.to_existing_atom("Elixir.#{module_name}")
   end
 
-  def mutate_all({:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, do_block]}, mutator, lines_to_mutate) do
-    mutated_do_block = mutate_all(do_block, mutator, lines_to_mutate)
-    {:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, mutated_do_block]}
+  def mutate_all(ast, mutator, lines_to_mutate, already_mutated_lines \\ [])
+
+  def mutate_all(
+    {:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, do_block]},
+    mutator, lines_to_mutate, already_mutated_lines
+  ) do
+    {mutated_lines, mutated_do_block} =
+      mutate_all(do_block, mutator, lines_to_mutate, already_mutated_lines)
+
+    {mutated_lines,
+      {:defmodule, mod_meta, [{:__aliases__, alias_meta, [module_name]}, mutated_do_block]}}
   end
 
-  def mutate_all([{construct, construct_body} | rest], mutator, lines_to_mutate) do
-    mutated_construct_body = mutate_all(construct_body, mutator, lines_to_mutate)
-    mutated_rest = mutate_all(rest, mutator, lines_to_mutate)
+  def mutate_all(
+    [{operator, body} | rest],
+    mutator, lines_to_mutate, already_mutated_lines
+  ) do
+    {mutated_lines_body, mutated_body} =
+      mutate_all(body, mutator, lines_to_mutate, already_mutated_lines)
 
-    [{construct, mutated_construct_body} | mutated_rest]
+    {mutated_lines_body_rest, mutated_rest} =
+      mutate_all(rest, mutator, lines_to_mutate, mutated_lines_body)
+
+    {mutated_lines_body_rest, [{operator, mutated_body} | mutated_rest]}
   end
 
-  def mutate_all({operator, meta, args} = ast, mutator, lines_to_mutate) do
+  def mutate_all(
+    {operator, meta, args} = ast, mutator, lines_to_mutate, already_mutated_lines
+  ) do
     case Enum.member?(lines_to_mutate, meta[:line]) do
       true ->
         case apply(mutator, :mutate, [ast, lines_to_mutate]) do
           :skip ->
-            {operator, meta, mutate_all(args, mutator, lines_to_mutate)}
+            {mutated_lines, mutated_args} =
+              mutate_all(args, mutator, lines_to_mutate, already_mutated_lines)
+
+            {mutated_lines, {operator, meta, mutated_args}}
 
           mutated_ast ->
-            mutated_ast
+            mutated_lines =
+              already_mutated_lines ++ [meta[:line]]
+              |> Enum.uniq()
+
+            {mutated_lines, mutated_ast}
         end
 
-      _ -> {operator, meta, mutate_all(args, mutator, lines_to_mutate)}
+      _ ->
+        {mutated_lines, mutated_args} =
+          mutate_all(args, mutator, lines_to_mutate, already_mutated_lines)
+
+        {mutated_lines, {operator, meta, mutated_args}}
     end
   end
 
-  def mutate_all([head | rest], mutator, lines_to_mutate) do
-    [
-      mutate_all(head, mutator, lines_to_mutate) |
-      mutate_all(rest, mutator, lines_to_mutate)
-    ]
+  def mutate_all([head | rest], mutator, lines_to_mutate, already_mutated_lines) do
+    {mutated_lines_head, mutated_head} = mutate_all(head, mutator, lines_to_mutate, already_mutated_lines)
+    {mutated_lines_head_rest, mutated_rest} = mutate_all(rest, mutator, lines_to_mutate, mutated_lines_head)
+
+    {mutated_lines_head_rest, [mutated_head | mutated_rest]}
   end
 
-  def mutate_all(any, _mutator, _lines_to_mutate), do: any
+  def mutate_all(any, _mutator, _lines_to_mutate, already_mutated_lines), do: {already_mutated_lines, any}
 end
