@@ -1,24 +1,19 @@
 defmodule Exavier.Server do
   use GenServer
 
-  defstruct runner_pid: nil
-
   @test_file_regexp ~r/^test(.*)_test.exs/
   @source_file_replacement "lib\\1.ex"
 
-  def start_link(runner_pid) do
-    GenServer.start_link(
-      __MODULE__,
-      %__MODULE__{runner_pid: runner_pid},
-      name: __MODULE__
-    )
+  def start_link() do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def init(state) do
     {:ok, state}
   end
 
-  def handle_cast(:xmen, state) do
+  @impl GenServer
+  def handle_call(:xmen, _from, state) do
     server = self()
 
     # coverage is checked sequentially
@@ -36,11 +31,12 @@ defmodule Exavier.Server do
       end)
 
     # mutations are applied in parallel (for each module)
-    lines_to_mutate_by_module
-    |> Enum.each(fn {
-      test_file, %{file: file, module: module, lines_to_mutate: lines_to_mutate}
-    } ->
-      Task.start(fn ->
+    result =
+      lines_to_mutate_by_module
+      |> Task.async_stream(fn {
+        test_file,
+        %{file: file, module: module, lines_to_mutate: lines_to_mutate}
+      } ->
         quoted = Exavier.file_to_quoted(file)
 
         Exavier.Mutators.mutators()
@@ -56,14 +52,15 @@ defmodule Exavier.Server do
               ExUnit.run()
           end
         end)
-
-        # TODO:
-        # only terminate after all tasks are complete
-        GenServer.stop(server, :normal)
       end)
-    end)
+      |> Enum.to_list()
+      |> Enum.all?(&Kernel.==(&1, :ok))
+      |> case do
+        true -> :ok
+        _ -> :error
+      end
 
-    {:noreply, state}
+    {:reply, :ok, state}
   end
 
   def test_files, do: Path.wildcard("test/**/*_test.exs")
@@ -77,10 +74,6 @@ defmodule Exavier.Server do
 
       {file, test_file}
     end)
-  end
-
-  def terminate(:normal, state) do
-    send(state.runner_pid, {:end, state})
   end
 
   defp record_mutation(module, mutated_lines, original, mutated) do
