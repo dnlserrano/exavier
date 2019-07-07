@@ -21,11 +21,27 @@ defmodule Exavier.Server do
   def handle_cast(:xmen, state) do
     server = self()
 
-    files()
-    |> Enum.each(fn {file, test_file} ->
+    # coverage is checked sequentially
+    lines_to_mutate_by_module =
+      files()
+      |> Enum.reduce(%{}, fn {file, test_file}, acc ->
+        module = Exavier.test_file_to_module(test_file)
+        lines_to_mutate = Exavier.Cover.lines_to_mutate(module, test_file)
+
+        Map.put(acc, test_file, %{
+          file: file,
+          module: module,
+          lines_to_mutate: lines_to_mutate
+        })
+      end)
+
+    # mutations are applied in parallel (for each module)
+    lines_to_mutate_by_module
+    |> Enum.each(fn {
+      test_file, %{file: file, module: module, lines_to_mutate: lines_to_mutate}
+    } ->
       Task.start(fn ->
-        {module_name, quoted} = Exavier.file_to_quoted(file)
-        lines_to_mutate = Exavier.Cover.lines_to_mutate(module_name, test_file)
+        quoted = Exavier.file_to_quoted(file)
 
         Exavier.Mutators.mutators()
         |> Enum.each(fn mutator ->
@@ -33,7 +49,7 @@ defmodule Exavier.Server do
             {[], _, _} -> :noop
 
             {mutated_lines, original, mutated} ->
-              record_mutation(test_file, mutated_lines, original, mutated)
+              record_mutation(module, mutated_lines, original, mutated)
               Code.require_file(test_file)
               Exavier.unrequire_file(test_file)
               ExUnit.Server.modules_loaded()
@@ -67,9 +83,7 @@ defmodule Exavier.Server do
     send(state.runner_pid, {:end, state})
   end
 
-  defp record_mutation(test_file, mutated_lines, original, mutated) do
-    module = Exavier.test_file_to_module(test_file)
-
+  defp record_mutation(module, mutated_lines, original, mutated) do
     Process.whereis(:exavier_reporter)
     |> GenServer.cast({:mutation, module, mutated_lines, original, mutated})
   end

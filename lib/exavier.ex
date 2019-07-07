@@ -4,16 +4,9 @@ defmodule Exavier do
   """
 
   def file_to_quoted(file) do
-    quoted =
-      file
-      |> File.read!()
-      |> Code.string_to_quoted!()
-
-    {:defmodule, _mod_meta, [{:__aliases__, _alias_meta, [module_name]}, _do_block]} = quoted
-
-    atom_module = string_to_elixir_module(module_name)
-
-    {atom_module, quoted}
+    file
+    |> File.read!()
+    |> Code.string_to_quoted!()
   end
 
   def test_module_to_module(test_module) do
