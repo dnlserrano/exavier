@@ -75,7 +75,7 @@ defmodule Exavier.Reporter do
 
       mutated
       |> Enum.each(fn m ->
-        IO.write("#{m |> diff("  -") |> green()}\n")
+        IO.write("#{m |> diff("  +") |> green()}\n")
         IO.write("\n")
       end)
 

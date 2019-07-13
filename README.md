@@ -75,11 +75,11 @@ Run `mix exavier.test` and you should see output similar to this:
   -   :no
   - end
 
-  - if(true) do
-  -   :yes
-  - else
-  -   :no
-  - end
+  + if(true) do
+  +   :yes
+  + else
+  +   :no
+  + end
 
 /Users/dnlserrano/Repos/exavier/test/hello_world_test.exs:10
 
