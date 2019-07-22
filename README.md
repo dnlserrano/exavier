@@ -14,7 +14,7 @@ A mutation testing library in Elixir. Inspired by [`pitest`](https://github.com/
 
 The `exavier` library mutates code in **parallel per module**, but mutates each module **sequentially per mutator**. Initial code line coverage analysis is done **sequentially for all modules** as a pre-processing step. It is better explained as follows:
 
-1. Run code line coverage analysis for each module, [sequentially](73daf82)
+1. Run code line coverage analysis for each module, [sequentially](https://github.com/dnlserrano/exavier/commit/73daf82a28f0d6ef10f89b3ae21dd72c02127df1)
 2. Mutate the code according to each available [mutator](#mutators)
     1. For each module, in parallel:
         1. For each mutator, sequentially:
