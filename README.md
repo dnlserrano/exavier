@@ -115,6 +115,11 @@ This is for now just a proof-of-concept. A lot of it has been no more than a joy
 - [ ] Have other ways of terminating mutation test suite (e.g., fast-fail if threshold of X mutants have survived)
 - [ ] Parallelise mutating module per mutator
 
+## More info
+
+- Discussion of the library at [ElixirForum.com](https://elixirforum.com/t/exavier-mutation-testing-library-for-elixir/24157)
+- I wrote about `exavier` in my [personal blog](https://dnlserrano.dev/2019/07/22/exavier-mutation-testing-elixir.html)
+
 ## Library name
 
 Inspired by [Dr. Charles Xavier (Professor X)](https://en.wikipedia.org/wiki/Professor_X) from the X-Men mutants comic books [I read as a kid](https://www.marvel.com/comics/series/474/ultimate_x-men_2000_-_2009).
