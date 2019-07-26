@@ -8,14 +8,13 @@ defmodule Exavier.Server do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  @impl GenServer
   def init(state) do
     {:ok, state}
   end
 
   @impl GenServer
   def handle_call(:xmen, _from, state) do
-    server = self()
-
     # coverage is checked sequentially
     lines_to_mutate_by_module =
       files()
@@ -31,34 +30,33 @@ defmodule Exavier.Server do
       end)
 
     # mutations are applied in parallel (for each module)
-    result =
-      lines_to_mutate_by_module
-      |> Task.async_stream(fn {
-        test_file,
-        %{file: file, module: module, lines_to_mutate: lines_to_mutate}
-      } ->
-        quoted = Exavier.file_to_quoted(file)
+    lines_to_mutate_by_module
+    |> Task.async_stream(fn {
+      test_file,
+      %{file: file, module: module, lines_to_mutate: lines_to_mutate}
+    } ->
+      quoted = Exavier.file_to_quoted(file)
 
-        Exavier.Mutators.mutators()
-        |> Enum.each(fn mutator ->
-          case Exavier.redefine(quoted, mutator, lines_to_mutate) do
-            {[], _, _} -> :noop
+      Exavier.Mutators.mutators()
+      |> Enum.each(fn mutator ->
+        case Exavier.redefine(quoted, mutator, lines_to_mutate) do
+          {[], _, _} -> :noop
 
-            {mutated_lines, original, mutated} ->
-              record_mutation(module, mutated_lines, original, mutated)
-              Code.require_file(test_file)
-              Exavier.unrequire_file(test_file)
-              ExUnit.Server.modules_loaded()
-              ExUnit.run()
-          end
-        end)
+          {mutated_lines, original, mutated} ->
+            record_mutation(module, mutated_lines, original, mutated)
+            Code.require_file(test_file)
+            Exavier.unrequire_file(test_file)
+            ExUnit.Server.modules_loaded()
+            ExUnit.run()
+        end
       end)
-      |> Enum.to_list()
-      |> Enum.all?(&Kernel.==(&1, :ok))
-      |> case do
-        true -> :ok
-        _ -> :error
-      end
+    end)
+    |> Enum.to_list()
+    |> Enum.all?(&Kernel.==(&1, :ok))
+    |> case do
+      true -> :ok
+      _ -> :error
+    end
 
     {:reply, :ok, state}
   end
