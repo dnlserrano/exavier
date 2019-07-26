@@ -72,11 +72,11 @@ defmodule Exavier do
   end
 
   defp string_to_elixir_module("Elixir." <> _rest = module_name) do
-    String.to_existing_atom(module_name)
+    String.to_atom(module_name)
   end
 
   defp string_to_elixir_module(module_name) do
-    String.to_existing_atom("Elixir.#{module_name}")
+    String.to_atom("Elixir.#{module_name}")
   end
 
   def mutate_all(ast, mutator, lines_to_mutate, already_mutated_lines \\ [])
