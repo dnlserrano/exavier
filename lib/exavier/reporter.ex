@@ -55,8 +55,12 @@ defmodule Exavier.Reporter do
 
     total = passed + failed
     percentage =
-      (failed * 1.0 / total) * 100
-      |> Float.round(2)
+      if total != 0 do
+        (failed * 1.0 / total) * 100
+        |> Float.round(2)
+      else
+        100
+      end
 
     IO.puts("\n")
 
