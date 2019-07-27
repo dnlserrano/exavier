@@ -31,6 +31,9 @@ defmodule Exavier.Server do
 
     # mutations are applied in parallel (for each module)
     lines_to_mutate_by_module
+    |> Enum.filter(fn {_test_file, %{lines_to_mutate: lines_to_mutate}} ->
+      length(lines_to_mutate) > 0
+    end)
     |> Task.async_stream(fn {
       test_file,
       %{file: file, module: module, lines_to_mutate: lines_to_mutate}
