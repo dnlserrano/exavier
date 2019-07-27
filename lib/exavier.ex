@@ -26,10 +26,12 @@ defmodule Exavier do
 
   def test_file_to_module(test_file) do
     test_file
-    |> Path.basename()
+    |> String.trim_leading("test/")
     |> String.trim_trailing("_test.exs")
     |> String.trim_trailing("_test.ex")
-    |> Macro.camelize()
+    |> String.split("/")
+    |> Enum.map(&Macro.camelize(&1))
+    |> Enum.join(".")
     |> string_to_elixir_module()
   end
 

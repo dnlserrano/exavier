@@ -2,7 +2,7 @@ defmodule Exavier.Cover do
   def lines_to_mutate(module_name, test_file) do
     :cover.stop()
     :cover.start()
-    :cover.compile_beam(module_name)
+    {:ok, _} = :cover.compile_beam(module_name)
 
     Code.require_file(test_file)
     Exavier.unrequire_file(test_file)
