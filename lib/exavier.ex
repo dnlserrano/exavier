@@ -3,6 +3,13 @@ defmodule Exavier do
   Documentation for Exavier.
   """
 
+  @default_timeout 5000
+  @timeouts %{
+    mutate_module: 5000,
+    mutate_everything: 60_000,
+    report: 1000,
+  }
+
   def file_to_quoted(file) do
     file
     |> File.read!()
@@ -141,4 +148,15 @@ defmodule Exavier do
   end
 
   def mutate_all(any, _mutator, _lines_to_mutate, already_mutated_lines), do: {already_mutated_lines, any}
+
+  def timeout(name) do
+    do_timeout(name, debug: System.get_env("EXAVIER_DEBUG"))
+  end
+
+  defp do_timeout(_name, debug: "1"), do: :infinity
+  defp do_timeout(_name, debug: "true"), do: :infinity
+
+  defp do_timeout(name, debug: _) do
+    Map.get(@timeouts, name, @default_timeout)
+  end
 end

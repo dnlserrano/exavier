@@ -50,7 +50,7 @@ defmodule Exavier.Server do
             ExUnit.run()
         end
       end)
-    end)
+    end, [ordered: false, timeout: timeout()])
     |> Enum.to_list()
     |> Enum.all?(&Kernel.==(&1, :ok))
     |> case do
@@ -78,4 +78,6 @@ defmodule Exavier.Server do
     Process.whereis(:exavier_reporter)
     |> GenServer.cast({:mutation, module, mutated_lines, original, mutated})
   end
+
+  defp timeout, do: Exavier.timeout(:mutate_module)
 end
