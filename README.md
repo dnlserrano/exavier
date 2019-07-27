@@ -119,6 +119,7 @@ This is for now just a proof-of-concept. A lot of it has been no more than a joy
 
 - Discussion of the library at [ElixirForum.com](https://elixirforum.com/t/exavier-mutation-testing-library-for-elixir/24157)
 - I wrote about `exavier` in my [personal blog](https://dnlserrano.dev/2019/07/22/exavier-mutation-testing-elixir.html)
+- Always happy to chat in the `elixir-lang` Slack channel over at `#exavier`
 
 ## Library name
 
