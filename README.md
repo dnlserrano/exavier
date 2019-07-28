@@ -39,6 +39,8 @@ You can create new mutators. You just have to make sure they abide to the (undoc
 A Mutator is an Elixir module that has two mandatory functions:
 
 * `operators/0`
+    1. input:
+        * (none)
     2. output:
         * an array of atoms (operators to which the mutation can be applied, e.g., `[:==, :>=]`)
 
