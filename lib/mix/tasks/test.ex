@@ -30,7 +30,9 @@ defmodule Mix.Tasks.Exavier.Test do
     {:ok, reporter} = Exavier.Reporter.start_link(name: :exavier_reporter)
     {:ok, server} = Exavier.Server.start_link()
     GenServer.call(server, :xmen, Exavier.timeout(:mutate_everything))
-    GenServer.call(reporter, :report, Exavier.timeout(:report))
+    {:ok, exit_code} = GenServer.call(reporter, :report, Exavier.timeout(:report))
+
+    exit({:shutdown, exit_code})
   end
 
   defp require_test_helper do

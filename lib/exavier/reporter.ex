@@ -90,15 +90,15 @@ defmodule Exavier.Reporter do
       "#{total} tests, #{failed} failed (mutants killed), #{passed} passed (mutants survived)\
     \n#{percentage}% mutation coverage"
 
-    message =
-      cond do
-        percentage > 75 -> green(message)
-        true -> red(message)
+    {exit_code, message} =
+      case percentage > mutation_testing_threshold() do
+        true -> {0, green(message)}
+        _ -> {1, red(message)}
       end
 
     IO.puts("\n#{message}")
 
-    {:reply, :ok, state}
+    {:reply, {:ok, exit_code}, state}
   end
 
   defp colorize(escape, string) do
@@ -156,6 +156,8 @@ defmodule Exavier.Reporter do
 
     {original, mutated, test}
   end
+
+  def mutation_testing_threshold, do: Application.get_env(:exavier, :threshold)
 
   defp diff(msg, padding_symbols), do: "#{padding_symbols} " <> Regex.replace(~r/\n(.*)/, msg, "\n#{padding_symbols} \\1")
   defp green(msg), do: colorize(:green, msg)
