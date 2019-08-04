@@ -108,7 +108,13 @@ Run `mix exavier.test` and you should see output similar to this:
 
 `exavier` provides the following configuration options:
 
-- `:test_files_to_modules`: Overrides the [default mapping](https://github.com/dnlserrano/exavier/blob/master/lib/exavier.ex#L27-L36) of finding a module based on its test file name. E.g., test file `test/my_file_abc_test.exs` might be testing module `MyFileABC` instead of `MyFileAbc` (`exavier`'s default mapping).
+- `:threshold`: Mutation testing coverage threshold (can be integer or floating point number)
+
+```elixir
+config :exavier, threshold: 66.67
+```
+
+- `:test_files_to_modules`: Overrides the [default mapping](https://github.com/dnlserrano/exavier/blob/master/lib/exavier.ex#L27-L36) of finding a module based on its test file name. E.g., test file `test/my_file_abc_test.exs` might be testing module `MyFileABC` instead of `MyFileAbc` (`exavier`'s default mapping)
 
 ```elixir
 config :exavier, test_files_to_modules: %{
