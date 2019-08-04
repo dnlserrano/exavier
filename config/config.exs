@@ -7,4 +7,4 @@ config :exavier,
     "test/exavier/mutators/ror1_test.exs" => Exavier.Mutators.ROR1,
     "test/exavier/mutators/ror4_test.exs" => Exavier.Mutators.ROR4
   },
-  threshold: 30
+  threshold: 27
