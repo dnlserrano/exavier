@@ -1,5 +1,7 @@
 # exavier
 
+[![Build Status](https://travis-ci.com/dnlserrano/exavier.svg?branch=master)](https://travis-ci.com/dnlserrano/exavier)
+
 ![](logo.png)
 
 A mutation testing library in Elixir. Inspired by [`pitest`](https://github.com/hcoles/pitest) (http://pitest.org) and [`mutant`](https://github.com/mbj/mutant).
