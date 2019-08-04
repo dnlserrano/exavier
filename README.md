@@ -104,6 +104,18 @@ Run `mix exavier.test` and you should see output similar to this:
 27.27% mutation coverage
 ```
 
+## Options
+
+`exavier` provides the following configuration options:
+
+- `:test_files_to_modules`: Overrides the [default mapping](https://github.com/dnlserrano/exavier/blob/master/lib/exavier.ex#L27-L36) of finding a module based on its test file name. E.g., test file `test/my_file_abc_test.exs` might be testing module `MyFileABC` instead of `MyFileAbc` (`exavier`'s default mapping).
+
+```elixir
+config :exavier, test_files_to_modules: %{
+  "test/my_file_abc_test.exs" => MyFileABC
+}
+```
+
 ## To be done
 
 This is for now just a proof-of-concept. A lot of it has been no more than a joyful exercise in exploring what tools Erlang and Elixir provide to make such a library possible. Among some things I'd love to tackle in the near future are:
