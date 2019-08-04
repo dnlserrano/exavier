@@ -34,9 +34,23 @@ Mutators specify ways in which we can mutate the code. Currently we have 5 proof
 
 `AOR` stands for "Arithmetic Operator Replacement". There are several possibilities for replacing an arithmetic operator. We follow the ones defined by [`pitest`](http://pitest.org/quickstart/mutators/#available-mutators-and-groups). Similarly, `ROR` stands for "Relational Operator Replacement". `IfTrue` is inspired by `pitest`'s "Remove Conditionals".
 
-You can create new mutators. You just have to make sure they abide to the (undocumented) interface they respect now. More on that in section ["To be done"](#to-be-done).
+You can create new mutators. You just have to make sure they abide to the interface provided by behaviour [`Exavier.Mutators.Mutator`](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/mutator.ex):
 
-A Mutator is an Elixir module that has two mandatory functions:
+```elixir
+defmodule Exavier.Mutators.Mutator do
+  @type operator() :: atom()
+  @type metadata() :: keyword()
+  @type args() :: term()
+
+  @type ast_node() :: {operator(), metadata(), args()}
+  @type lines_to_mutate() :: [integer()]
+
+  @callback operators() :: [operator()]
+  @callback mutate(ast_node(), lines_to_mutate()) :: ast_node() | :skip
+end
+```
+
+An `Exavier.Mutators.Mutator` has two mandatory functions:
 
 * `operators/0`
     1. input:
@@ -110,7 +124,6 @@ This is for now just a proof-of-concept. A lot of it has been no more than a joy
   - [ ] [Conditionals Boundary](http://pitest.org/quickstart/mutators/#CONDITIONALS_BOUNDARY)
   - [ ] [Negate Conditionals](http://pitest.org/quickstart/mutators/#NEGATE_CONDITIONALS)
   - [ ] [Invert Negatives](http://pitest.org/quickstart/mutators/#INVERT_NEGS)
-- [ ] Add [behaviour](https://elixir-lang.org/getting-started/typespecs-and-behaviours.html#behaviours) for mutators
 - [ ] Ability to tune which mutators are used
 - [ ] Ability to add custom mutators defined by the user (i.e., not in `exavier`)
 - [ ] Analyse if we really should or shouldn't care about pre-processing step of code line coverage
