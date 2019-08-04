@@ -1,6 +1,7 @@
 # exavier
 
 [![Build Status](https://travis-ci.com/dnlserrano/exavier.svg?branch=master)](https://travis-ci.com/dnlserrano/exavier)
+[![Hex pm](http://img.shields.io/hexpm/v/exavier.svg?style=flat)](https://hex.pm/packages/exavier)
 
 ![](logo.png)
 
