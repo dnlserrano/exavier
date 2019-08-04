@@ -129,7 +129,6 @@ config :exavier, test_files_to_modules: %{
 This is for now just a proof-of-concept. A lot of it has been no more than a joyful exercise in exploring what tools Erlang and Elixir provide to make such a library possible. Among some things I'd love to tackle in the near future are:
 
 - [ ] Add way more tests (OMG the irony, forgive me, this is still a bit of a PoC as you can tell by the length of this "To be done" section)
-- [ ] Have exavier run as a CI step on exavier (Inception much?)
 - [ ] Add mutators
   - [x] [AOR1](http://pitest.org/quickstart/mutators/#AOR)
   - [x] [AOR2](http://pitest.org/quickstart/mutators/#AOR)
