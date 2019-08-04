@@ -1,4 +1,6 @@
 defmodule Exavier.Mutators.AOR1 do
+  @behaviour Exavier.Mutators.Mutator
+
   @mutations %{
     :+ => :-,
     :- => :+,
@@ -7,8 +9,10 @@ defmodule Exavier.Mutators.AOR1 do
     :rem => :*
   }
 
+  @impl Exavier.Mutators.Mutator
   def operators, do: Map.keys(@mutations)
 
+  @impl Exavier.Mutators.Mutator
   def mutate({operator, meta, args}, lines_to_mutate) do
     mutated_operator = @mutations[operator]
     do_mutate({mutated_operator, meta, args}, lines_to_mutate)
