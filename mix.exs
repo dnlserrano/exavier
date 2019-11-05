@@ -8,6 +8,7 @@ defmodule Exavier.MixProject do
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       description: description(),
+      aliases: aliases(),
       package: package(),
       deps: deps()
     ]
@@ -31,8 +32,14 @@ defmodule Exavier.MixProject do
       licenses: ["MIT"],
       links: %{
         github: "https://github.com/dnlserrano/exavier",
-        personal: "https://dnlserrano.dev",
-      },
+        personal: "https://dnlserrano.dev"
+      }
+    ]
+  end
+
+  defp aliases do
+    [
+      test: ["exavier.test"]
     ]
   end
 end
