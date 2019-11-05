@@ -9,7 +9,8 @@ defmodule Exavier.MixProject do
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env()),
     ]
   end
 
@@ -24,6 +25,9 @@ defmodule Exavier.MixProject do
   end
 
   defp deps, do: []
+
+  defp elixirc_paths(:test), do: ["lib", "test/fixtures"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp package do
     [
