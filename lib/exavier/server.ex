@@ -1,9 +1,6 @@
 defmodule Exavier.Server do
   use GenServer
 
-  @test_file_regexp ~r/^test(.*)_test.exs/
-  @source_file_replacement "lib\\1.ex"
-
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -17,14 +14,14 @@ defmodule Exavier.Server do
   def handle_call(:xmen, _from, state) do
     # coverage is checked sequentially
     lines_to_mutate_by_module =
-      files()
-      |> Enum.reduce(%{}, fn {file, test_file}, acc ->
+      test_files()
+      |> Enum.reduce(%{}, fn test_file, acc ->
         module = Exavier.test_file_to_module(test_file)
-        lines_to_mutate = Exavier.Cover.lines_to_mutate(module, test_file)
+        {file, lines_to_mutate} = Exavier.Cover.lines_to_mutate(module, test_file)
 
         Map.put(acc, test_file, %{
-          file: file,
           module: module,
+          file: file,
           lines_to_mutate: lines_to_mutate
         })
       end)
@@ -65,17 +62,6 @@ defmodule Exavier.Server do
   end
 
   def test_files, do: Path.wildcard("test/**/*_test.exs")
-
-  def files do
-    test_files()
-    |> Enum.map(fn test_file ->
-      file =
-        test_file
-        |> String.replace(@test_file_regexp, @source_file_replacement)
-
-      {file, test_file}
-    end)
-  end
 
   defp record_mutation(module, mutated_lines, original, mutated) do
     Process.whereis(:exavier_reporter)

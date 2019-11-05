@@ -5,7 +5,7 @@ defmodule Exavier.Cover do
     :cover.stop()
     :cover.start()
 
-    {:ok, :compiled} = cover_compile(module_name, test_file)
+    {:ok, source} = cover_compile(module_name, test_file)
 
     Code.require_file(test_file)
     Exavier.unrequire_file(test_file)
@@ -14,8 +14,7 @@ defmodule Exavier.Cover do
 
     {:result, coverage_results, _failures} = :cover.analyse(:coverage, :line)
 
-    coverage_results
-    |> covered_lines()
+    {source, covered_lines(coverage_results)}
   end
 
   defp covered_lines(coverage_results) do
@@ -33,7 +32,9 @@ defmodule Exavier.Cover do
     case :cover.compile_beam(module_name) do
       {:error, :non_existing} ->
         load_non_default_module_name(module_name, test_file)
-      {:ok, _} -> {:ok, :compiled}
+      {:ok, _} ->
+        source = module_name.__info__(:compile)[:source]
+        {:ok, source}
     end
   end
 
@@ -51,7 +52,9 @@ defmodule Exavier.Cover do
           {:error, :non_existing} ->
             Logger.error("Could not find module #{non_default_module_name} defined in option :test_files_to_modules for #{test_file}.")
 
-          {:ok, _} -> {:ok, :compiled}
+          {:ok, _} ->
+            source = non_default_module_name.__info__(:compile)[:source]
+            {:ok, source}
         end
     end
   end
