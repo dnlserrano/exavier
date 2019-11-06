@@ -10,4 +10,8 @@ defmodule FooBarTest do
   test "when [1, 2, 3], list_sum 6" do
     assert @subject.list_sum([1, 2, 3]) == 6
   end
+
+  test "when one number is negative" do
+    assert @subject.div(100, -20) == -5
+  end
 end
