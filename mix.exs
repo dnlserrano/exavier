@@ -16,7 +16,8 @@ defmodule Exavier.MixProject do
 
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      env: [test_file_to_module_func: [Exavier, :test_file_to_module_func]]
     ]
   end
 

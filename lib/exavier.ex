@@ -25,14 +25,44 @@ defmodule Exavier do
   end
 
   def test_file_to_module(test_file) do
+    [module, func_atom]  = Application.get_env(:exavier, :test_file_to_module_func)
+    apply(module, func_atom, [test_file])
+  end
+
+
+  def test_file_to_module_func(test_file) do
+    test_file
+    |> trim_test_parts()
+    |> string_to_module_format()
+    |> string_to_elixir_module()
+  end
+
+  def test_file_to_phoenix_module_func(test_file) do
+    test_file
+    |> trim_test_parts()
+    |> trim_phoenix_modules()
+    |> string_to_module_format()
+    |> string_to_elixir_module()
+  end
+
+  def trim_test_parts(test_file) do
     test_file
     |> String.trim_leading("test/")
     |> String.trim_trailing("_test.exs")
     |> String.trim_trailing("_test.ex")
+  end
+
+  def string_to_module_format(string_path) do
+    string_path
     |> String.split("/")
     |> Enum.map(&Macro.camelize(&1))
     |> Enum.join(".")
-    |> string_to_elixir_module()
+  end
+
+  def trim_phoenix_modules(test_file) do
+    test_file
+    |> String.replace("/controllers/", "/")
+    |> String.replace("/views/", "/")
   end
 
   def quoted_to_string([do: {:__block__, [], args}], lines) do
