@@ -31,26 +31,31 @@ defmodule Exavier.Server do
     |> Enum.filter(fn {_test_file, %{lines_to_mutate: lines_to_mutate}} ->
       length(lines_to_mutate) > 0
     end)
-    |> Task.async_stream(fn {
-      test_file,
-      %{file: file, module: module, lines_to_mutate: lines_to_mutate}
-    } ->
-      quoted = Exavier.file_to_quoted(file)
+    |> Task.async_stream(
+      fn {
+           test_file,
+           %{file: file, module: module, lines_to_mutate: lines_to_mutate}
+         } ->
+        quoted = Exavier.file_to_quoted(file)
 
-      Exavier.Mutators.mutators()
-      |> Enum.each(fn mutator ->
-        case Exavier.redefine(quoted, mutator, lines_to_mutate) do
-          {[], _, _} -> :noop
+        Exavier.Mutators.mutators()
+        |> Enum.each(fn mutator ->
+          case Exavier.redefine(quoted, mutator, lines_to_mutate) do
+            {[], _, _} ->
+              :noop
 
-          {mutated_lines, original, mutated} ->
-            record_mutation(module, mutated_lines, original, mutated)
-            Code.require_file(test_file)
-            Exavier.unrequire_file(test_file)
-            ExUnit.Server.modules_loaded()
-            ExUnit.run()
-        end
-      end)
-    end, [ordered: false, timeout: timeout()])
+            {mutated_lines, original, mutated} ->
+              record_mutation(module, mutated_lines, original, mutated)
+              Code.require_file(test_file)
+              Exavier.unrequire_file(test_file)
+              ExUnit.Server.modules_loaded()
+              ExUnit.run()
+          end
+        end)
+      end,
+      ordered: false,
+      timeout: timeout()
+    )
     |> Enum.to_list()
     |> Enum.all?(&Kernel.==(&1, :ok))
     |> case do

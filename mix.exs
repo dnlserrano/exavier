@@ -10,7 +10,7 @@ defmodule Exavier.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env()),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -35,8 +35,8 @@ defmodule Exavier.MixProject do
       licenses: ["MIT"],
       links: %{
         github: "https://github.com/dnlserrano/exavier",
-        personal: "https://dnlserrano.dev",
-      },
+        personal: "https://dnlserrano.dev"
+      }
     ]
   end
 end

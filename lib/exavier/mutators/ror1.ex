@@ -7,7 +7,7 @@ defmodule Exavier.Mutators.ROR1 do
     :> => :<,
     :>= => :<,
     :== => :<,
-    :!= => :<,
+    :!= => :<
   }
 
   @impl Exavier.Mutators.Mutator

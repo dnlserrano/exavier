@@ -57,7 +57,7 @@ defmodule Exavier.Mutators.ROR4Test do
 
     test @description do
       assert @subject.mutate(@original_code, @lines_to_mutate) ==
-        @mutated_code
+               @mutated_code
     end
   end)
 end
