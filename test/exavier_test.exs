@@ -5,7 +5,7 @@ defmodule ExavierTest do
 
   test "returns quoted code from given file" do
     {:defmodule, _meta, [{:__aliases__, [line: 1], [module]}, _]} =
-      @subject.file_to_quoted("lib/foo_bar.ex")
+      @subject.file_to_quoted("test/fixtures/foo_bar.ex")
 
     assert module == :FooBar
   end
