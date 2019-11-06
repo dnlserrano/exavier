@@ -114,6 +114,18 @@ defmodule Exavier do
     {mutated_lines_body_rest, [{operator, mutated_body} | mutated_rest]}
   end
 
+  def mutate_all({:&, meta, args} = _ast, mutator, lines_to_mutate, already_mutated_lines) do
+    current_line = meta[:line]
+    {mutated_lines, mutated_args} =
+      case Enum.member?(lines_to_mutate, current_line) do
+        true ->
+          mutate_all(args, mutator, List.delete(lines_to_mutate, current_line), [current_line | already_mutated_lines])
+        _ ->
+          mutate_all(args, mutator, lines_to_mutate, already_mutated_lines)
+        end
+    {mutated_lines, {:&, meta, mutated_args}}
+  end
+
   def mutate_all(
     {operator, meta, args} = ast, mutator, lines_to_mutate, already_mutated_lines
   ) do
