@@ -41,7 +41,7 @@ defmodule Exavier.Cover do
 
   defp load_non_default_module_name(module_name, test_file) do
     non_default_module_name =
-      Application.get_env(:exavier, :test_files_to_modules)
+      Config.get(:test_files_to_modules)
       |> do_load_non_default_module_name(test_file)
 
     case non_default_module_name do
