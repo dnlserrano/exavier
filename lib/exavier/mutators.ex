@@ -4,7 +4,7 @@ defmodule Exavier.Mutators do
     __MODULE__.AOR2,
     __MODULE__.ROR1,
     __MODULE__.ROR4,
-    __MODULE__.IfTrue,
+    __MODULE__.IfTrue
   ]
 
   def operators do

@@ -32,6 +32,7 @@ defmodule Exavier.Cover do
     case :cover.compile_beam(module_name) do
       {:error, :non_existing} ->
         load_non_default_module_name(module_name, test_file)
+
       {:ok, _} ->
         source = module_name.__info__(:compile)[:source]
         {:ok, source}
@@ -45,12 +46,18 @@ defmodule Exavier.Cover do
 
     case non_default_module_name do
       {:error, :non_existing_override} ->
-        Logger.error("Could not find module #{module_name} inferred from test file #{test_file}. You can define your overrides using the :test_files_to_modules option in exavier.")
+        Logger.error(
+          "Could not find module #{module_name} inferred from test file #{test_file}. You can define your overrides using the :test_files_to_modules option in exavier."
+        )
 
       _ ->
         case :cover.compile_beam(non_default_module_name) do
           {:error, :non_existing} ->
-            Logger.error("Could not find module #{non_default_module_name} defined in option :test_files_to_modules for #{test_file}.")
+            Logger.error(
+              "Could not find module #{non_default_module_name} defined in option :test_files_to_modules for #{
+                test_file
+              }."
+            )
 
           {:ok, _} ->
             source = non_default_module_name.__info__(:compile)[:source]

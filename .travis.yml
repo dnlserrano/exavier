@@ -3,4 +3,4 @@ elixir:
   - '1.9'
 otp_release:
   - '21.3'
-script: MIX_ENV=test mix test && MIX_ENV=test mix exavier.test
+script: mix format && MIX_ENV=test mix test && MIX_ENV=test mix exavier.test

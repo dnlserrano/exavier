@@ -21,11 +21,11 @@ defmodule Exavier.Reporter do
 
     mutated_modules =
       Map.put(state.mutated_modules, module, %{
-        mutated_module |
-        status: :recording,
-        original: original,
-        mutation: mutation,
-        mutated_lines: mutated_lines
+        mutated_module
+        | status: :recording,
+          original: original,
+          mutation: mutation,
+          mutated_lines: mutated_lines
       })
 
     {:noreply, %{state | mutated_modules: mutated_modules}}
@@ -39,7 +39,10 @@ defmodule Exavier.Reporter do
   end
 
   @impl GenServer
-  def handle_cast({:test_finished, %ExUnit.Test{state: {:failed, _failed}, module: test_module}}, state) do
+  def handle_cast(
+        {:test_finished, %ExUnit.Test{state: {:failed, _failed}, module: test_module}},
+        state
+      ) do
     module = Exavier.test_module_to_module(test_module)
     state = measure_mutation_killed(module, state)
     {:noreply, state}
@@ -56,9 +59,10 @@ defmodule Exavier.Reporter do
       |> Enum.reduce(0, fn {_, info}, sum -> info.passed + sum end)
 
     total = passed + failed
+
     percentage =
       if total != 0 do
-        (failed * 1.0 / total) * 100
+        (failed * 1.0 / total * 100)
         |> Float.round(2)
       else
         100
@@ -116,8 +120,7 @@ defmodule Exavier.Reporter do
 
   defp do_measure_mutation_killed(module, %{status: :recording} = mutated_module, state) do
     failed = mutated_module.failed + 1
-    mutated_modules =
-      Map.put(state.mutated_modules, module, %{mutated_module | failed: failed})
+    mutated_modules = Map.put(state.mutated_modules, module, %{mutated_module | failed: failed})
 
     green(".") |> IO.write()
 
@@ -133,8 +136,7 @@ defmodule Exavier.Reporter do
 
   defp do_measure_mutation_survived(module, %{status: :recording} = mutated_module, test, state) do
     passed = mutated_module.passed + 1
-    mutated_modules =
-      Map.put(state.mutated_modules, module, %{mutated_module | passed: passed})
+    mutated_modules = Map.put(state.mutated_modules, module, %{mutated_module | passed: passed})
 
     all_failures = state.all_failures ++ [explain(module, test, state)]
 
@@ -162,7 +164,9 @@ defmodule Exavier.Reporter do
   defp mutation_testing_threshold,
     do: Application.get_env(:exavier, :threshold, @default_mutation_testing_threshold)
 
-  defp diff(msg, padding_symbols), do: "#{padding_symbols} " <> Regex.replace(~r/\n(.*)/, msg, "\n#{padding_symbols} \\1")
+  defp diff(msg, padding_symbols),
+    do: "#{padding_symbols} " <> Regex.replace(~r/\n(.*)/, msg, "\n#{padding_symbols} \\1")
+
   defp green(msg), do: colorize(:green, msg)
   defp red(msg), do: colorize(:red, msg)
 
