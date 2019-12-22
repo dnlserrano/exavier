@@ -14,4 +14,8 @@ defmodule FooBarTest do
   test "when one number is negative" do
     assert @subject.div(100, -20) == -5
   end
+
+  test "when 0, div -1" do
+    assert @subject.div(20, 0) == -1
+  end
 end

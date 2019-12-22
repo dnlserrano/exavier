@@ -7,5 +7,7 @@ defmodule FooBar do
 
   def div(a, b) when b != 0, do: a / b
 
+  def div(_a, _b), do: -1
+
   defp add(a, b), do: a + b
 end

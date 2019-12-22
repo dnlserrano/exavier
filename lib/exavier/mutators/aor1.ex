@@ -14,9 +14,13 @@ defmodule Exavier.Mutators.AOR1 do
 
   @impl Exavier.Mutators.Mutator
   def mutate({operator, meta, args}, lines_to_mutate) do
-    mutated_operator = @mutations[operator]
+    mutated_operator = mutate_operator(operator, args)
     do_mutate({mutated_operator, meta, args}, lines_to_mutate)
   end
+
+  defp mutate_operator(:-, args) when length(args) == 1, do: :-
+
+  defp mutate_operator(operator, _args), do: @mutations[operator]
 
   defp do_mutate({nil, _, _}, _), do: :skip
 
