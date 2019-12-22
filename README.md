@@ -118,7 +118,7 @@ Run `mix exavier.test` and you should see output similar to this:
 
 %{
   ...
-  threshold: 66.67
+  threshold: 67
   ...
 }
 ```
