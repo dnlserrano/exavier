@@ -14,8 +14,11 @@ defmodule Exavier.Config do
       |> File.read!()
       |> Code.eval_string()
 
-    Map.get(configs, key, default)
+    do_get(configs, key, default)
   end
+
+  defp do_get(nil, _key, default), do: default
+  defp do_get(configs, key, default), do: Map.get(configs, key, default)
 
   def exists?, do: config_file() |> File.exists?()
 
