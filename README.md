@@ -75,7 +75,7 @@ The package can be installed by adding `exavier` to your list of dependencies in
 ```elixir
 def deps do
   [
-    {:exavier, "~> 0.1.4"}
+    {:exavier, "~> 0.1.5"}
   ]
 end
 ```
