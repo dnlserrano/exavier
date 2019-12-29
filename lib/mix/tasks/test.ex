@@ -10,6 +10,8 @@ defmodule Mix.Tasks.Exavier.Test do
       )
     end
 
+    Exavier.Config.ensure_loaded_configs()
+
     Mix.shell().print_app
     Mix.Task.run("app.start", [])
 

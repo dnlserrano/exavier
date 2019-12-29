@@ -1,7 +1,7 @@
 defmodule Exavier.Reporter do
   use GenServer
 
-  @default_mutation_testing_threshold 75
+  @default_mutation_testing_threshold 67
 
   # mutated_modules :: map
   #   * key :: module name :: string
@@ -162,7 +162,7 @@ defmodule Exavier.Reporter do
   end
 
   defp mutation_testing_threshold,
-    do: Application.get_env(:exavier, :threshold, @default_mutation_testing_threshold)
+    do: Exavier.Config.get(:threshold, @default_mutation_testing_threshold)
 
   defp diff(msg, padding_symbols),
     do: "#{padding_symbols} " <> Regex.replace(~r/\n(.*)/, msg, "\n#{padding_symbols} \\1")
