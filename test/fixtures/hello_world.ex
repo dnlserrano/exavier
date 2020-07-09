@@ -9,4 +9,7 @@ defmodule HelloWorld do
       :no
     end
   end
+
+  def lie_to_me?(true), do: true
+  def lie_to_me?(false), do: false
 end
