@@ -27,15 +27,17 @@ The `exavier` library mutates code in **parallel per module**, but mutates each 
 
 ### Mutators
 
-Mutators specify ways in which we can mutate the code. Currently we have 5 proof-of-concept mutators available in `exavier`:
+Mutators specify ways in which we can mutate the code. Currently we have 6 proof-of-concept mutators available in `exavier`:
 
   - [AOR1](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/aor1.ex)
   - [AOR2](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/aor2.ex)
   - [ROR1](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/ror1.ex)
   - [ROR4](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/ror4.ex)
   - [IfTrue](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/if_true.ex)
+  - [NegateConditionals](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/negate_conditionals.ex)
 
 `AOR` stands for "Arithmetic Operator Replacement". There are several possibilities for replacing an arithmetic operator. We follow the ones defined by [`pitest`](http://pitest.org/quickstart/mutators/#available-mutators-and-groups). Similarly, `ROR` stands for "Relational Operator Replacement". `IfTrue` is inspired by `pitest`'s "Remove Conditionals".
+`NegateConditionals` is also inspired by `pitest`.
 
 You can create new mutators. You just have to make sure they abide to the interface provided by behaviour [`Exavier.Mutators.Mutator`](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/mutator.ex):
 
@@ -154,7 +156,7 @@ This is for now just a proof-of-concept. A lot of it has been no more than a joy
   - [x] [Remove Conditionals](http://pitest.org/quickstart/mutators/#REMOVE_CONDITIONALS)
     - Can still be done for `case`, `unless`
   - [ ] [Conditionals Boundary](http://pitest.org/quickstart/mutators/#CONDITIONALS_BOUNDARY)
-  - [ ] [Negate Conditionals](http://pitest.org/quickstart/mutators/#NEGATE_CONDITIONALS)
+  - [x] [Negate Conditionals](http://pitest.org/quickstart/mutators/#NEGATE_CONDITIONALS)
   - [ ] [Invert Negatives](http://pitest.org/quickstart/mutators/#INVERT_NEGS)
 - [ ] Ability to tune which mutators are used
 - [ ] Ability to add custom mutators defined by the user (i.e., not in `exavier`)
