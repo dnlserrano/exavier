@@ -68,6 +68,18 @@ An `Exavier.Mutators.Mutator` has two mandatory functions:
     2. output:
         * mutated AST node (e.g., `{operator, meta, args}`)
 
+Add custom mutators to `.exavier.exs` under the `:custom_mutators` key:
+
+```elixir
+%{
+  ...
+  custom_mutators: [
+    MyApp.MySpecialMutator
+  ]
+  ...
+}
+```
+
 ## Installation
 
 The package can be installed by adding `exavier` to your list of dependencies in `mix.exs`:
@@ -137,6 +149,19 @@ Run `mix exavier.test` and you should see output similar to this:
 }
 ```
 
+- `:custom_mutators`: Adds mutator modules to be run during tests.
+  See the [Mutators](#mutators) section for directions on how to create your own mutators.
+
+```elixir
+%{
+  ...
+  custom_mutators: [
+    MyApp.MySpecialMutator
+  ]
+  ...
+}
+```
+
 ## To be done
 
 This is for now just a proof-of-concept. A lot of it has been no more than a joyful exercise in exploring what tools Erlang and Elixir provide to make such a library possible. Among some things I'd love to tackle in the near future are:
@@ -157,7 +182,7 @@ This is for now just a proof-of-concept. A lot of it has been no more than a joy
   - [ ] [Negate Conditionals](http://pitest.org/quickstart/mutators/#NEGATE_CONDITIONALS)
   - [ ] [Invert Negatives](http://pitest.org/quickstart/mutators/#INVERT_NEGS)
 - [ ] Ability to tune which mutators are used
-- [ ] Ability to add custom mutators defined by the user (i.e., not in `exavier`)
+- [x] Ability to add custom mutators defined by the user (i.e., not in `exavier`)
 - [ ] Analyse if we really should or shouldn't care about pre-processing step of code line coverage
 - [ ] Have other ways of terminating mutation test suite (e.g., fast-fail if threshold of X mutants have survived)
 - [ ] Parallelise mutating module per mutator

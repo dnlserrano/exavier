@@ -8,12 +8,20 @@ defmodule Exavier.Mutators do
   ]
 
   def operators do
-    @mutators
+    mutators()
     |> Enum.flat_map(fn mutator ->
       mutator.operators()
     end)
     |> Enum.uniq()
   end
 
-  def mutators, do: @mutators
+  def mutators do
+    custom_mutators = Exavier.Config.get(:custom_mutators, [])
+
+    unless is_list(custom_mutators) do
+      raise "The `:custom_mutators` key in `.exavier.exs` must be a list."
+    end
+
+    @mutators ++ custom_mutators
+  end
 end
