@@ -24,7 +24,11 @@ defmodule Exavier.MixProject do
     "Elixir mutation testing library"
   end
 
-  defp deps, do: []
+  defp deps do
+    [
+      {:ex_doc, "~> 0.23", only: :dev, runtime: false}
+    ]
+  end
 
   defp elixirc_paths(:test), do: ["lib", "test/fixtures"]
   defp elixirc_paths(_), do: ["lib"]
