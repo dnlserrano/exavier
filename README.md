@@ -174,7 +174,7 @@ This is for now just a proof-of-concept. A lot of it has been no more than a joy
   - [x] [AOR1](http://pitest.org/quickstart/mutators/#AOR)
   - [x] [AOR2](http://pitest.org/quickstart/mutators/#AOR)
   - [x] [AOR3](http://pitest.org/quickstart/mutators/#AOR)
-  - [ ] [AOR4](http://pitest.org/quickstart/mutators/#AOR)
+  - [x] [AOR4](http://pitest.org/quickstart/mutators/#AOR)
   - [x] [ROR1](http://pitest.org/quickstart/mutators/#ROR)
   - [ ] [ROR2](http://pitest.org/quickstart/mutators/#ROR)
   - [ ] [ROR3](http://pitest.org/quickstart/mutators/#ROR)
