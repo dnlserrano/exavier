@@ -2,7 +2,10 @@ defmodule Exavier.Mutators do
   @mutators [
     __MODULE__.AOR1,
     __MODULE__.AOR2,
+    __MODULE__.AOR3,
+    __MODULE__.AOR4,
     __MODULE__.ROR1,
+    __MODULE__.ROR2,
     __MODULE__.ROR4,
     __MODULE__.IfTrue,
     __MODULE__.NegateConditionals,
