@@ -1,4 +1,26 @@
 defmodule Exavier.Mutators.ROR5 do
+  @moduledoc """
+  Mutates relational operators into another operation.
+
+  Operators are replaced according to the table below.
+
+  | Original | Mutation |
+  |----------|----------|
+  | <        | !=       |
+  | <=       | !=       |
+  | >        | !=       |
+  | >=       | !=       |
+  | ==       | !=       |
+  | !=       | ==       |
+
+  For example:
+
+      a < 5
+
+  will be mutated into
+
+      a != 5
+  """
   @behaviour Exavier.Mutators.Mutator
 
   @mutations %{
