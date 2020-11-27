@@ -27,12 +27,17 @@ The `exavier` library mutates code in **parallel per module**, but mutates each 
 
 ### Mutators
 
-Mutators specify ways in which we can mutate the code. Currently we have 7 proof-of-concept mutators available in `exavier`:
+Mutators specify ways in which we can mutate the code. Currently we have 12 proof-of-concept mutators available in `exavier`:
 
   - [AOR1](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/aor1.ex)
   - [AOR2](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/aor2.ex)
+  - [AOR3](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/aor3.ex)
+  - [AOR4](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/aor4.ex)
   - [ROR1](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/ror1.ex)
+  - [ROR2](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/ror2.ex)
+  - [ROR3](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/ror3.ex)
   - [ROR4](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/ror4.ex)
+  - [ROR5](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/ror5.ex)
   - [IfTrue](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/if_true.ex)
   - [NegateConditionals](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/negate_conditionals.ex)
   - [ConditionalsBoundary](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/conditionals_boundary.ex)
