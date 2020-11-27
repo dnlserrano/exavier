@@ -6,6 +6,7 @@ defmodule Exavier.Mutators do
     __MODULE__.AOR4,
     __MODULE__.ROR1,
     __MODULE__.ROR2,
+    __MODULE__.ROR3,
     __MODULE__.ROR4,
     __MODULE__.IfTrue,
     __MODULE__.NegateConditionals,
