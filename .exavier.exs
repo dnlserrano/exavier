@@ -8,6 +8,7 @@
     "test/exavier/mutators/ror1_test.exs" => Exavier.Mutators.ROR1,
     "test/exavier/mutators/ror2_test.exs" => Exavier.Mutators.ROR2,
     "test/exavier/mutators/ror3_test.exs" => Exavier.Mutators.ROR3,
-    "test/exavier/mutators/ror4_test.exs" => Exavier.Mutators.ROR4
+    "test/exavier/mutators/ror4_test.exs" => Exavier.Mutators.ROR4,
+    "test/exavier/mutators/ror5_test.exs" => Exavier.Mutators.ROR5
   }
 }
