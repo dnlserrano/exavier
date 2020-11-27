@@ -11,7 +11,8 @@ defmodule Exavier.Mutators do
     __MODULE__.ROR5,
     __MODULE__.IfTrue,
     __MODULE__.NegateConditionals,
-    __MODULE__.ConditionalsBoundary
+    __MODULE__.ConditionalsBoundary,
+    __MODULE__.InvertNegatives
   ]
 
   def operators do

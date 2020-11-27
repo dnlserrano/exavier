@@ -27,7 +27,7 @@ The `exavier` library mutates code in **parallel per module**, but mutates each 
 
 ### Mutators
 
-Mutators specify ways in which we can mutate the code. Currently we have 12 proof-of-concept mutators available in `exavier`:
+Mutators specify ways in which we can mutate the code. Currently we have 13 mutators available in `exavier`:
 
   - [AOR1](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/aor1.ex)
   - [AOR2](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/aor2.ex)
@@ -41,6 +41,7 @@ Mutators specify ways in which we can mutate the code. Currently we have 12 proo
   - [IfTrue](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/if_true.ex)
   - [NegateConditionals](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/negate_conditionals.ex)
   - [ConditionalsBoundary](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/conditionals_boundary.ex)
+  - [InvertNegatives](https://github.com/dnlserrano/exavier/blob/master/lib/exavier/mutators/invert_negatives.ex)
 
 `AOR` stands for "Arithmetic Operator Replacement". There are several possibilities for replacing an arithmetic operator. We follow the ones defined by [`pitest`](http://pitest.org/quickstart/mutators/#available-mutators-and-groups). Similarly, `ROR` stands for "Relational Operator Replacement". `IfTrue` is inspired by `pitest`'s "Remove Conditionals".
 `NegateConditionals` is also inspired by `pitest`.
@@ -189,7 +190,7 @@ This is for now just a proof-of-concept. A lot of it has been no more than a joy
     - Can still be done for `case`, `unless`
   - [x] [Conditionals Boundary](http://pitest.org/quickstart/mutators/#CONDITIONALS_BOUNDARY)
   - [x] [Negate Conditionals](http://pitest.org/quickstart/mutators/#NEGATE_CONDITIONALS)
-  - [ ] [Invert Negatives](http://pitest.org/quickstart/mutators/#INVERT_NEGS)
+  - [x] [Invert Negatives](http://pitest.org/quickstart/mutators/#INVERT_NEGS)
 - [ ] Ability to tune which mutators are used
 - [x] Ability to add custom mutators defined by the user (i.e., not in `exavier`)
 - [ ] Analyse if we really should or shouldn't care about pre-processing step of code line coverage
