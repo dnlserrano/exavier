@@ -179,6 +179,7 @@ This is for now just a proof-of-concept. A lot of it has been no more than a joy
   - [x] [ROR2](http://pitest.org/quickstart/mutators/#ROR)
   - [x] [ROR3](http://pitest.org/quickstart/mutators/#ROR)
   - [x] [ROR4](http://pitest.org/quickstart/mutators/#ROR)
+  - [x] [ROR5](http://pitest.org/quickstart/mutators/#ROR)
   - [x] [Remove Conditionals](http://pitest.org/quickstart/mutators/#REMOVE_CONDITIONALS)
     - Can still be done for `case`, `unless`
   - [x] [Conditionals Boundary](http://pitest.org/quickstart/mutators/#CONDITIONALS_BOUNDARY)
