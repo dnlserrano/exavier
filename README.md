@@ -96,7 +96,7 @@ The package can be installed by adding `exavier` to your list of dependencies in
 ```elixir
 def deps do
   [
-    {:exavier, "~> 0.2.0"}
+    {:exavier, "~> 0.3.0"}
   ]
 end
 ```
